@@ -43,6 +43,27 @@ download, install, and build with `instantiate`.
 ] test
 ```
 
+Or: in Julia:
+
+```
+import Pkg
+Pkg.add("JSON")
+Pkg.add("HTTP")
+Pkg.add("Glob")
+Pkg.add("Logging")
+Pkg.add("LoggingExtras")
+Pkg.precompile()
+```
+
+Using the ] key to activate the environment and add packages is a convenient way
+ to manage dependencies within a specific environment. 
+ It allows you to easily add, remove, and update packages as needed.
+
+On the other hand, adding packages with the using command is useful when you 
+want to make sure that specific packages are available in your code. 
+This method can be especially helpful if you are sharing code with others, 
+as it ensures that they have all the necessary dependencies installed.
+
 ## Manifest.toml
 
 The Manifest.toml file in a Julia project is automatically generated and 
@@ -103,3 +124,40 @@ A SwiftUI app for creating custom art with the Mandelbrot set.
 - [MandArt source repo - ARCHIVED](https://github.com/denisecase/MandArt) 
 
 ![MandArt](https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/denisecase/Opening.png)
+
+
+## Using Docker
+
+Steps:
+
+1. Build the Docker image.
+2. Create an ECR repository for the lambda function.
+3. Get the respositoryUri in the output.
+4. Log in to the ECR repository.
+5. Tag the Docker image and push it to the ECR repository.
+6. Create the Lambda function using the custom runtime.
+
+Open PowerShell in root project repo directory. 
+
+```
+docker build -t mandmath_lambda .
+
+aws ecr create-repository --repository-name mandmath_lambda
+
+aws ecr get-login-password --region <your_aws_region> | docker login --username AWS --password-stdin <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com
+
+docker tag mandmath_lambda:latest <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest
+
+docker push <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest
+
+aws lambda create-function \
+    --function-name JuliaLambdaFunction \
+    --package-type Image \
+    --code ImageUri=<your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest \
+    --role arn:aws:iam::<your_account_id>:role/lambda_basic_execution \
+    --timeout 10 \
+    --memory-size 1024 \
+    --region <your_aws_region>
+
+
+```

@@ -34,17 +34,22 @@ To exit the interactive session:
 
 Julia REPL examples.
 
-`using Pkg`
-`Pkg.upgrade_manifest()`
+```
+versioninfo()
 
-Get Id with:
+using Pkg
+Pkg.upgrade_manifest()
 
-`using UUIDs`
-`uuid4()`
+# Get a unique ID
 
-Load current package with:
+using UUIDs
+uuid4()
 
-`using MandMath`
-`using .`
+# Load current package with:
 
-This will compile the module and make its exported functions and variables available in the current namespace.
+using MandMath
+using .
+
+```
+
+`Using MandMath` compiles the module and makes its exported functions and variables available in the current namespace.
