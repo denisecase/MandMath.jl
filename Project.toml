@@ -1,0 +1,23 @@
+name = "MandMath"
+uuid = "5eade205-40b2-460b-887b-cce267fcf17d"
+author = ["Denise Case"]
+version = "0.1.0"
+
+[deps]
+Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+JuliaInterpreter = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
