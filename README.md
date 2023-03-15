@@ -14,16 +14,20 @@
 
 Open PowerShell in root project directory. 
 
-`julia`
-`]`
-`instantiate`
-`activate .`
-`test`
+```
+julia
+]
+instantiate
+activate .
+test
+```
 
 Ctrl C to return to Julia REPL. Load our MandMath module and call a function. 
 
-`using MandMath`
-`MandMath.greet()`
+```
+using MandMath
+MandMath.greet()
+```
 
 CTRL D to exit back to PowerShell. 
 
@@ -32,11 +36,12 @@ CTRL D to exit back to PowerShell.
 Activate the environment, add the package to Project.toml, 
 download, install, and build with `instantiate`.
 
-`] activate .`
-`] add Combinatorics`
-`] instantiate`
-`] test`
-
+```
+] activate .
+] add Combinatorics
+] instantiate
+] test
+```
 
 ## Manifest.toml
 
@@ -47,6 +52,7 @@ Project.toml file.
 
 ```
 julia
+
 ] activate .
 ```
 
