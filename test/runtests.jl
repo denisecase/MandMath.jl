@@ -2,8 +2,10 @@ import CSV
 import Coverage
 import DelimitedFiles
 import HTTP
-using JSON
+import Logging
+import LoggingExtras
 
+using JSON
 using MandMath
 using Test
 
@@ -212,7 +214,6 @@ using Test
 
         @testset "Test 1: Check if the CSV file is created with the correct name" begin
             input_file = joinpath(@__DIR__, "..", "data", "brucehjohnson", "Rectangle1.mandart")
-            @info "TESTING WRITE TO CSV WITH input_file: $input_file"
             grid4x3 = Array{Float64,2}([
                 1.0 2.0 3.0
                 4.0 5.0 6.0
@@ -221,9 +222,14 @@ using Test
             ])
             MandMath.write_grid_to_csv(input_file, grid4x3)
             base_name_without_ext = splitext(basename(input_file))[1]
-            output_filename = joinpath(@__DIR__, base_name_without_ext * ".csv")
-            @test isfile(output_filename)
-            rm(output_filename)  # Cleanup the test file
+            output_file_basename = joinpath(base_name_without_ext * ".csv")
+            output_dir = joinpath(@__DIR__, "..", "output")
+            if !isdir(output_dir)
+                Base.mkdir(output_dir)
+            end
+            output_file = joinpath(output_dir, output_file_basename) 
+            @test isfile(output_file)
+            rm(output_file)  # Cleanup the test file
         end
 
         @testset "Test 2: Check if the CSV file contains the correct data" begin
@@ -236,16 +242,21 @@ using Test
             ])
             MandMath.write_grid_to_csv(input_file, grid4x2)
             base_name_without_ext = splitext(basename(input_file))[1]
-            output_filename = joinpath(@__DIR__, base_name_without_ext * ".csv")
-            @test isfile(output_filename)
-            data = DelimitedFiles.readdlm(output_filename, ',', Float64)
+            output_file_basename = joinpath(base_name_without_ext * ".csv")
+            output_dir = joinpath(@__DIR__, "..", "output")
+            if !isdir(output_dir)
+                Base.mkdir(output_dir)
+            end
+            output_file = joinpath(output_dir, output_file_basename) 
+            @test isfile(output_file)
+            data = DelimitedFiles.readdlm(output_file, ',', Float64)
             output_grid = reshape(data, 4, 2)
             for i in 1:4, j in 1:2
                 @test grid4x2[i, j] ≈ output_grid[i, j]
                 atol = 1e-14
                 rtol = 1e-14
             end
-            rm(output_filename)  # Cleanup the test file
+            rm(output_file)  # Cleanup the test file
         end
 
     end

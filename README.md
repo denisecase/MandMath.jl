@@ -3,21 +3,13 @@
 [![Build Status](https://github.com/denisecase/MandMath.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/denisecase/MandMath.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 
 
-## Background Documentation
-
-- [Juila Installation on Windows](docs/Julia-Installation-Windows.md)
-- [Julia in VS Code (using PowerShell)](docs/Julia-VSCode.md)
-- [Juila REPL](docs/REPL.md)
-- [Julia Package REPL](docs/Package-REPL.md)
-
-
 ## Julia in VS Code
 
 Add Julia extension. When prompted, set setting.julia.executablePath to:
 
 `C:\\Users\\deniselive\\AppData\\Local\\Programs\\Julia-1.8.5\\bin\\julia.exe`
 
-## Activate Project Environment and Test
+## Activate Project Environment, Compile, and Test
 
 Open PowerShell in root project directory. 
 
@@ -29,7 +21,11 @@ instantiate
 test
 ```
 
-Hit backspace or Ctrl C to return to Julia REPL. Load our MandMath module and call a function. 
+Hit backspace or Ctrl C to return to Julia REPL. 
+
+Load our MandMath module and call the main() function. 
+
+Note: This does not update any changes to the code. 
 
 ```
 using MandMath
@@ -88,37 +84,9 @@ julia
 ] activate .
 ```
 
-## Example Output
+## Notes On Julia
 
-```
-==============================================
-MandMath.jl loaded successfully.
-==============================================
-
-Welcome to MandMath!
-We'll use this to create a Julia executable.
-We can use 150 decimal places for X and Y.
-
-==============================================
-MandMath.jl completed successfully.
-==============================================
-
-xCenter is -0.75
-yCenter is 0.0
-scale is 4.3e+02
-c is -0.75 + 0.0im
-xCenter is 1.2345678901234566904321354741114191710948944091796875
-yCenter is 0.876543210987654308752325960085727274417877197265625
-scale is 1.2e+08
-c is 1.2345678901234566904321354741114191710948944091796875 + 0.876543210987654308752325960085727274417877197265625im
-xCenter is 1.2345678901234566904321354741114191710948944091796875
-yCenter is 0.876543210987654308752325960085727274417877197265625
-scale is 1.2e+08
-c is 1.2345678901234566904321354741114191710948944091796875 + 0.876543210987654308752325960085727274417877197265625im
-Test Summary:  | Pass  Total  Time
-MandMath Tests |    9      9  2.2s
-     Testing MandMath tests passed
-```
+- See docs folder.
 
 ## MandArt
 
@@ -135,40 +103,3 @@ A SwiftUI app for creating custom art with the Mandelbrot set.
 - [MandArt source repo - ARCHIVED](https://github.com/denisecase/MandArt) 
 
 ![MandArt](https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/denisecase/Opening.png)
-
-
-## Using Docker
-
-Steps:
-
-1. Build the Docker image.
-2. Create an ECR repository for the lambda function.
-3. Get the respositoryUri in the output.
-4. Log in to the ECR repository.
-5. Tag the Docker image and push it to the ECR repository.
-6. Create the Lambda function using the custom runtime.
-
-Open PowerShell in root project repo directory. 
-
-```
-docker build -t mandmath_lambda .
-
-aws ecr create-repository --repository-name mandmath_lambda
-
-aws ecr get-login-password --region <your_aws_region> | docker login --username AWS --password-stdin <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com
-
-docker tag mandmath_lambda:latest <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest
-
-docker push <your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest
-
-aws lambda create-function \
-    --function-name JuliaLambdaFunction \
-    --package-type Image \
-    --code ImageUri=<your_account_id>.dkr.ecr.<your_aws_region>.amazonaws.com/mandmath_lambda:latest \
-    --role arn:aws:iam::<your_account_id>:role/lambda_basic_execution \
-    --timeout 10 \
-    --memory-size 1024 \
-    --region <your_aws_region>
-
-
-```

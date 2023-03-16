@@ -5,11 +5,13 @@ functions.jl is a Julia file for defining functions for MandMath.jl.
 
 # Combinatorics is a Julia package for doing combinatorics
 # and formatting large numbers
-import Printf
-import JSON
-import HTTP
-import Glob
 import CSV
+import Glob
+import HTTP
+import JSON
+import Logging
+import LoggingExtras
+import Printf
 import Tables
 
 # export public facing functions so they can be tested and used
@@ -73,28 +75,18 @@ function arrays_equal(array1::Array{Float64,2}, array2::Array{Float64,2})
 end
 
 function greet()
-    return """
-    Welcome to MandMath!
-    We'll use this to create a Julia executable.
-    We can use 150 decimal places for X and Y.
-    """
+    return "Welcome to MandMath!"
 end
 
 function get_grid(inputs::GridInputs)
-    @info "functions.get_grid() called."
-
     w, h = inputs.imageWidth, inputs.imageHeight
     xCenter, yCenter, scale = inputs.xCenter, inputs.yCenter, inputs.scale
-
-    # Define the bounds for each of the inputs
 
     wmin, wmax = 4, 10000
     hmin, hmax = 4, 10000
     xmin, xmax = -2.0, 2.0
     ymin, ymax = -2.0, 2.0
     scalemin, scalemax = 1.0, 1.0e100
-
-    # Check if the inputs are within acceptable bounds
 
     if w < wmin || w > wmax
         error("image width, w, must be between $wmin and $wmax pixels.")
@@ -112,26 +104,10 @@ function get_grid(inputs::GridInputs)
         error("Scale must be between $scalemin and $scalemax.")
     end
 
-    #=
-     Create a grid of points from w and height
-     each element is initialized to 1. 
-     Populate the grid with random numbers between 1.24 and 567.83
-     =#
     grid = Array{Float64}(undef, w, h)
-
     for i in 1:w, j in 1:h
         grid[i, j] = 1.24 + rand() * (567.83 - 1.24)
     end
-
-    println("xCenter is $xCenter")
-    println("yCenter is $yCenter")
-
-    println("scale is $scale")
-
-    c = complex(xCenter, yCenter)
-    println("c is $c")
-
-    @info "functions.get_grid() completed. Returning grid."
     return grid
 end
 
@@ -160,10 +136,9 @@ function process_file_or_url(input)
         response = HTTP.get(input)
         try
             data = JSON.parse(String(response.body))
-            @info "JSON data: $data"
             inputs = get_grid_inputs(data)
             grid = get_grid(inputs)
-          #  MandMath.write_grid_to_csv(grid, input)
+            #  MandMath.write_grid_to_csv(grid, input)
         catch e
             if isa(e, JSON.ParserError)
                 @error "Response from the URL is not valid JSON. Might be HTML or other format."
@@ -215,27 +190,33 @@ function write_grid_to_csv(input_filename::String, grid::Array{Float64,2})
     @info "functions.write_grid_to_csv() called with $input_filename."
     base_name = basename(input_filename)
     base_name_without_ext = splitext(base_name)[1]
-    output_filename = joinpath(base_name_without_ext * ".csv")
-    @info "functions.write_grid_to_csv() writing to $output_filename."
+    output_file_basename = joinpath(base_name_without_ext * ".csv")
+    @info "functions.write_grid_to_csv() writing to $output_file_basename."
+    output_dir = joinpath(@__DIR__, "..", "output")
+    if !isdir(output_dir)
+        Base.mkdir(output_dir)
+    end
+    output_file = joinpath(output_dir, output_file_basename)    
+    @info "functions.write_grid_to_csv() writing to $output_file."
     table = Tables.table(grid)
-    CSV.write(output_filename, table, header=false)
-end
-
-function show_opening()
-    @info "show_opening called."
-    io = open("log.txt", "w+")
-    logger = SimpleLogger(io)
-    global_logger(logger)
-    @info "MandMath.jl loaded successfully."
-end
-
-function show_closing()
-    @info "MandMath.jl completed successfully."
-    close(io)
+    CSV.write(output_file, table, header=false)
 end
 
 function main(args::Vector{String}=ARGS)
     @info "MandMath.main() called."
+    println(greet())
+    log_dir = joinpath(@__DIR__, "..", "logs")
+    if !isdir(log_dir)
+        Base.mkdir(log_dir)
+    end
+    log_info = joinpath(log_dir, "loginfo.txt")
+    log_warn = joinpath(log_dir, "logwarn.txt")
+    logger = LoggingExtras.TeeLogger(
+        LoggingExtras.MinLevelLogger(LoggingExtras.FileLogger(log_info), Logging.Info),
+        LoggingExtras.MinLevelLogger(LoggingExtras.FileLogger(log_warn), Logging.Warn),
+    )
+    Logging.global_logger(logger)
+
     # If no input file/url is provided, read from urls.txt and process all files
     if isempty(args) || length(args) == 0
         try
@@ -267,15 +248,5 @@ end
 
 # execute some code if this file is run directly
 if isfile(@__FILE__)
-    @info "MandMath.jl loaded successfully."
-    println(greet())
     main(ARGS)
-    @info "MandMath.jl completed successfully."
-end
-
-if isfile(@__FILE__)
-    @info "MandMath.jl loaded successfully."
-    println(greet())
-    main(ARGS)
-    @info "MandMath.jl completed successfully."
 end
