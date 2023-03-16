@@ -23,9 +23,8 @@ In this case, the code simply prints the message or result to the console.
 
 You can use shell mode to run entire Julia scripts, like this:
 
-```julia
-julia myscript.jl
-```
+`julia myscript.jl`
+
 
 ## Commands
 

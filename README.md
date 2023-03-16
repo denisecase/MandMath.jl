@@ -10,6 +10,13 @@
 - [Juila REPL](docs/REPL.md)
 - [Julia Package REPL](docs/Package-REPL.md)
 
+
+## Julia in VS Code
+
+Add Julia extension. When prompted, set setting.julia.executablePath to:
+
+`C:\\Users\\deniselive\\AppData\\Local\\Programs\\Julia-1.8.5\\bin\\julia.exe`
+
 ## Activate Project Environment and Test
 
 Open PowerShell in root project directory. 
@@ -30,6 +37,17 @@ MandMath.greet()
 ```
 
 CTRL D to exit back to PowerShell. 
+
+## Test Coverage
+
+`] Add Coverage`
+
+Run tests with Coverage:
+
+julia> `using Coverage`
+
+julia> `@coverage run test MyPackage`
+
 
 ## Adding a new Package (example)
 
@@ -53,6 +71,7 @@ Pkg.add("Glob")
 Pkg.add("Logging")
 Pkg.add("LoggingExtras")
 Pkg.precompile()
+using MandMath
 ```
 
 Using the ] key to activate the environment and add packages is a convenient way
