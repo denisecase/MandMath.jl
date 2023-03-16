@@ -1,3 +1,3 @@
-https://github.com/denisecase/MandArt-Discoveries/blob/main/brucehjohnson/Rectangle1.mandart
-https://github.com/denisecase/MandArt-Discoveries/blob/main/brucehjohnson/Rectangle2.mandart
-https://github.com/denisecase/MandArt-Discoveries/blob/main/denisecase/Opening.mandart
+https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/brucehjohnson/Rectangle1.mandart
+https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/brucehjohnson/Rectangle2.mandart
+https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/denisecase/Opening.mandart

@@ -24,16 +24,16 @@ Open PowerShell in root project directory.
 ```
 julia
 ]
-instantiate
 activate .
+instantiate
 test
 ```
 
-Ctrl C to return to Julia REPL. Load our MandMath module and call a function. 
+Hit backspace or Ctrl C to return to Julia REPL. Load our MandMath module and call a function. 
 
 ```
 using MandMath
-MandMath.greet()
+MandMath.main()
 ```
 
 CTRL D to exit back to PowerShell. 
@@ -41,13 +41,6 @@ CTRL D to exit back to PowerShell.
 ## Test Coverage
 
 `] Add Coverage`
-
-Run tests with Coverage:
-
-julia> `using Coverage`
-
-julia> `@coverage run test MyPackage`
-
 
 ## Adding a new Package (example)
 
@@ -69,7 +62,6 @@ Pkg.add("JSON")
 Pkg.add("HTTP")
 Pkg.add("Glob")
 Pkg.add("Logging")
-Pkg.add("LoggingExtras")
 Pkg.precompile()
 using MandMath
 ```

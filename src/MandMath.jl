@@ -10,12 +10,13 @@ module MandMath
 # first, import from external packages (in alphabetical order)
 
 import Base: PROGRAM_FILE
-import Glob
+import CSV
+import Coverage
+import DelimitedFiles
 import HTTP
 import JSON
-import Logging
-import LoggingExtras
-import Pkg
+import Glob
+import Tables
 
 # Include other files in the module
 include("functions.jl")
