@@ -1,0 +1,183 @@
+        - 
+        - import CSV
+        - import Glob
+        - import HTTP
+        - import JSON
+        - import Logging
+        - import Printf
+        - import Tables
+        - 
+        - export get_grid
+        - export get_grid_inputs
+        - export GridInputs
+        - 
+        - struct GridInputs
+        -     imageWidth::Int
+        -     imageHeight::Int
+        -     xCenter::BigFloat
+        -     yCenter::BigFloat
+        -     scale::BigFloat
+        -     iterationsMax::Float64
+        -     rSqLimit::Float64
+        -     dFIterMin::Float64
+        -     theta::Float64
+        -     yY::Float64
+        - 
+       15     function GridInputs(; imageWidth::Int=IMAGE_WIDTH_DEFAULT, imageHeight::Int=IMAGE_HEIGHT_DEFAULT, xCenter::Union{BigFloat,Float64}=X_CENTER_DEFAULT, yCenter::Union{BigFloat,Float64}=Y_CENTER_DEFAULT, scale::BigFloat=SCALE_DEFAULT, iterationsMax::Float64=ITERATIONS_MAX_DEFAULT, rSqLimit::Float64=R_SQ_LIMIT_DEFAULT, dFIterMin::Float64=DF_ITER_MIN_DEFAULT, theta::Float64=THETA_DEFAULT, yY::Float64=YY_DEFAULT)
+        8         new(imageWidth, imageHeight, xCenter, yCenter, scale, iterationsMax, rSqLimit, dFIterMin, theta, yY)
+        -     end
+        - end
+        - 
+        4 function get_grid_inputs(data::Dict)
+        6     imageWidth = Int(get(data, "imageWidth", IMAGE_WIDTH_DEFAULT))
+        6     imageHeight = Int(get(data, "imageHeight", IMAGE_HEIGHT_DEFAULT))
+        6     xCenter = BigFloat(get(data, "xCenter", X_CENTER_DEFAULT))
+        7     yCenter = BigFloat(get(data, "yCenter", Y_CENTER_DEFAULT))
+        6     scale = BigFloat(get(data, "scale", SCALE_DEFAULT))
+        6     iterationsMax = Float64(get(data, "iterationsMax", ITERATIONS_MAX_DEFAULT))
+        6     rSqLimit = Float64(get(data, "rSqLimit", R_SQ_LIMIT_DEFAULT))
+        6     dFIterMin = Float64(get(data, "dFIterMin", DF_ITER_MIN_DEFAULT))
+        7     theta = Float64(get(data, "theta", THETA_DEFAULT))
+        6     yY = Float64(get(data, "yY", YY_DEFAULT))
+        4     return GridInputs(; imageWidth, imageHeight, xCenter, yCenter, scale, iterationsMax, rSqLimit, dFIterMin, theta, yY)
+        - end
+        - 
+        4 function get_grid(inputs::GridInputs)
+        4     w, h = inputs.imageWidth, inputs.imageHeight
+        - 
+        4     xCenter, yCenter, scale = inputs.xCenter, inputs.yCenter, inputs.scale
+        - 
+        4     wmin, wmax = 4, 10000
+        4     hmin, hmax = 4, 10000
+        4     xmin, xmax = -2.0, 2.0
+        4     ymin, ymax = -2.0, 2.0
+        4     scalemin, scalemax = 1.0, 1.0e100
+        - 
+        8     if w < wmin || w > wmax
+        0         error("image width, w, must be between $wmin and $wmax pixels.")
+        -     end
+        8     if h < hmin || h > hmax
+        0         error("image height, h, must be between $hmin and $hmax pixels.")
+        -     end
+        8     if xCenter < xmin || xCenter > xmax
+        0         error("Starting X must be between $xmin and $xmax.")
+        -     end
+        8     if yCenter < ymin || yCenter > ymax
+        0         error("Starting Y must be between $ymin and $ymax.")
+        -     end
+        8     if scale < scalemin || scale > scalemax
+        0         error("Scale must be between $scalemin and $scalemax.")
+        -     end
+        - 
+        4     grid = Array{Float64}(undef, w, h)
+        - 
+        4     easy = true
+        - 
+        4     if easy
+     4604         for i in 1:w, j in 1:h
+  4600000             grid[i, j] = 1.24 + rand() * (567.83 - 1.24)
+  4604596         end
+        4         return grid
+        -     else
+        - 
+        -         # replicate mandart
+        - 
+        0         thetaR = pi * theta / 180.0 # R for Radians
+        0         rSq = 0.0
+        0         rSqMax = 0.0
+        0         x0 = 0.0
+        0         y0 = 0.0
+        0         dX = 0.0
+        0         dY = 0.0
+        0         xx = 0.0
+        0         yy = 0.0
+        0         xTemp = 0.0
+        0         iter = 0.0
+        0         dIter = 0.0
+        0         gGML = 0.0
+        0         gGL = 0.0
+        0         fIter = zeros(Float64, (inputs.imageWdith, inputs.imageHeight))
+        0         fIterMinLeft = 0.0
+        0         fIterMinRight = 0.0
+        0         fIterBottom = zeros(Float64, inputs.imageWidth)
+        0         fIterTop = zeros(Float64, inputs.imageWidth)
+        0         fIterMinBottom = 0.0
+        0         fIterMinTop = 0.0
+        0         fIterMins = zeros(Float64, 4)
+        0         fIterMin = 0.0
+        0         p = 0.0
+        0         test1 = 0.0
+        0         test2 = 0.0
+        - 
+        0         rSqMax = 1.01 * (inputs.rSqLimit + 2) * (inputs.rSqLimit + 2)
+        0         gGML = log(log(rSqMax)) - log(log(inputs.rSqLimit))
+        0         gGL = log(log(inputs.rSqLimit))
+        - 
+        0         for u in 0:(inputs.imageWidth-1)
+        0             for v in 0:(inputs.imageHeight-1)
+        - 
+        0                 dX = (Float64(u) - Float64(inputs.imageWidth) / 2.0) / scale
+        0                 dY = (Float64(v) - Float64(inputs.imageHeight) / 2.0) / scale
+        - 
+        0                 x0 = xCenter + dX * cos(thetaR) - dY * sin(thetaR)
+        0                 y0 = yCenter + dX * sin(thetaR) + dY * cos(thetaR)
+        - 
+        0                 xx = x0
+        0                 yy = y0
+        0                 rSq = xx * xx + yy * yy
+        0                 iter = 0.0
+        - 
+        0                 p = sqrt((xx - 0.25) * (xx - 0.25) + yy * yy)
+        0                 test1 = p - 2.0 * p * p + 0.25
+        0                 test2 = (xx + 1.0) * (xx + 1.0) + yy * yy
+        - 
+        0                 if xx < test1 || test2 < 0.0625
+        0                     fIter[u,v] = iterationsMax # black
+        0                     iter = iterationsMax # black
+        -                 end
+        - 
+        0                 if iter < iterationsMax
+        0                     dIter = Double(-(log(log(rSq)) - gGL) / gGML)
+        - 
+        0                     fIter[u,v] = iter + dIter
+        - 
+        -                 else
+        0                     fIter[u,v] = iter
+        -                 end
+        - 
+        0             end # end first for v
+        0         end # end first for u
+        - 
+        - 
+        0         fIterGlobal = fIter
+        - 
+        0         for u in 0:(inputs.imageWidth-1)
+        0             fIterBottom[u] = fIter[u,0]
+        0             fIterTop[u] = fIter[u,inputs.imageHeight-1]
+        0         end #second for u
+        - 
+        -         #fIterMinLeft = fIter[0].min()!
+        0         fIterMinLeft = minimum(fIter[1, :]; emptycheck=true)
+        - 
+        -         #fIterMinRight = fIter[inputs.imageWidth - 1].min()! 
+        0         fIterMinRight = minimum(fIter[inputs.imageWidth, :]; emptycheck=true)
+        - 
+        -         #fIterMinBottom = fIterBottom.min()!
+        0         fIterMinBottom = minimum(fIterBottom; emptycheck=true)
+        - 
+        -         #fIterMinTop = fIterTop.min()!
+        0         fIterMinTop = minimum(fIter[:, 1]; emptycheck=true)
+        - 
+        - 
+        0         fIterMins = [fIterMinLeft, fIterMinRight, fIterMinBottom, fIterMinTop]
+        - 
+        -         #fIterMin = fIterMins.min()!
+        0         fIterMin = minimum(fIterMins; emptycheck=true)
+        - 
+        0         fIterMin = fIterMin - dFIterMin
+        - 
+        -     end # not easy
+        - 
+        0     return fIter
+        - end
+        - 

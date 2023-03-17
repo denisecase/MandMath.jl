@@ -11,7 +11,16 @@ Add Julia extension. When prompted, set setting.julia.executablePath to:
 
 ## Activate Project Environment, Compile, and Test
 
+
+
 Open PowerShell in root project directory. 
+
+To run it all: 
+
+`julia jj.jl`
+
+
+
 
 ```
 julia
@@ -82,11 +91,21 @@ Project.toml file.
 julia
 
 ] activate .
+
+instantiate
 ```
 
 ## Notes On Julia
 
 - See docs folder.
+
+## Clean cache
+
+julia> using Pkg
+
+julia> Pkg.compilecache(Pkg.PackageSpec(path="MandMath"), force=true)
+
+
 
 ## MandArt
 

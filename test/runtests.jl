@@ -9,6 +9,10 @@ using JSON
 using MandMath
 using Test
 
+include("../src/constants.jl")
+include("../src/functions.jl")
+include("../src/grid.jl")
+
 @testset "MandMath Tests" begin
 
     @testset "arrays_equal" begin
@@ -197,14 +201,14 @@ using Test
     @testset "read_urls_from_file" begin
 
         @testset "Existing file" begin
-            test_file = joinpath(@__DIR__, "..", "data", "urls.txt")
+            test_file = joinpath(@__DIR__, "..", DATA_FOLDER, DATA_URL_FILE)
             # Make sure you create this file and populate it with sample URLs before running the test
             urls = MandMath.read_urls_from_file(test_file)
             @test length(urls) > 0
         end
 
         @testset "Non-existing file" begin
-            test_file = joinpath(@__DIR__, "..", "data", "non_existent_file.txt")
+            test_file = joinpath(@__DIR__, "..", DATA_FOLDER, "non_existent_file.txt")
             @test_throws Exception read_urls_from_file(test_file)
         end
 
@@ -213,7 +217,7 @@ using Test
     @testset "write_grid_to_csv" begin
 
         @testset "Test 1: Check if the CSV file is created with the correct name" begin
-            input_file = joinpath(@__DIR__, "..", "data", "brucehjohnson", "Rectangle1.mandart")
+            input_file = joinpath(@__DIR__, "..", DATA_FOLDER, "brucehjohnson", "Rectangle1.mandart")
             grid4x3 = Array{Float64,2}([
                 1.0 2.0 3.0
                 4.0 5.0 6.0
@@ -222,8 +226,8 @@ using Test
             ])
             MandMath.write_grid_to_csv(input_file, grid4x3)
             base_name_without_ext = splitext(basename(input_file))[1]
-            output_file_basename = joinpath(base_name_without_ext * ".csv")
-            output_dir = joinpath(@__DIR__, "..", "output")
+            output_file_basename = joinpath(base_name_without_ext * OUT_FILE_EXT)
+            output_dir = joinpath(@__DIR__, "..", OUTPUT_FOLDER)
             if !isdir(output_dir)
                 Base.mkdir(output_dir)
             end
@@ -233,7 +237,7 @@ using Test
         end
 
         @testset "Test 2: Check if the CSV file contains the correct data" begin
-            input_file = joinpath(@__DIR__, "..", "data", "brucehjohnson", "Rectangle2.mandart")
+            input_file = joinpath(@__DIR__, "..", DATA_FOLDER, "brucehjohnson", "Rectangle2.mandart")
             grid4x2 = Array{Float64,2}([
                 1.0 2.0
                 4.0 5.0
@@ -242,8 +246,8 @@ using Test
             ])
             MandMath.write_grid_to_csv(input_file, grid4x2)
             base_name_without_ext = splitext(basename(input_file))[1]
-            output_file_basename = joinpath(base_name_without_ext * ".csv")
-            output_dir = joinpath(@__DIR__, "..", "output")
+            output_file_basename = joinpath(base_name_without_ext * OUT_FILE_EXT)
+            output_dir = joinpath(@__DIR__, "..", OUTPUT_FOLDER)
             if !isdir(output_dir)
                 Base.mkdir(output_dir)
             end

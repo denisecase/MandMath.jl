@@ -1,4 +1,0 @@
-┌ Info: functions.process_file_or_url() called with https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/brucehjohnson/Rectangle1.mandart.
-└ @ MandMath C:\Users\deniselive\Documents\MandMath.jl\src\functions.jl:133
-┌ Info: Reading from input URL: https://raw.githubusercontent.com/denisecase/MandArt-Discoveries/main/brucehjohnson/Rectangle1.mandart
-└ @ MandMath C:\Users\deniselive\Documents\MandMath.jl\src\functions.jl:135
