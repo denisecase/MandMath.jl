@@ -1,11 +1,5 @@
 # Julia Code Notes
 
-
-When src and data are same level under root:
-
-`urls_file = joinpath(@__DIR__,"..",DATA_FOLDER, DATA_URL_FILE)`
-
-
 ## Decimal Places
 
 Julia's default Float64 type has about 15-16 decimal digits of precision. 

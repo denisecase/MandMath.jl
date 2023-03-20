@@ -1,33 +1,32 @@
 # SPDX-License-Identifier: MIT
 
-"""
-MandMath.jl is a Julia package for doing math related to Mandelbrot sets.
-
-"""
-
 module MandMath
 
-import CSV
-import Coverage
-import DelimitedFiles
-import Glob
-import HTTP
-import JSON
-import Logging
-import LoggingExtras
-import Tables
+include("app.jl")
+include("calculator.jl")
+include("reader.jl")
+include("writer.jl")
 
-include("constants.jl")
-include("functions.jl")
-include("grid.jl")
+export run
 
-# Export functions and types visible outside the module
+# reader
 
-export greet
+export is_url
+export process_file
+export process_directory
+export process_url
+export read_urls_from_file
+
+# calculator
+
 export get_grid
 export get_grid_inputs
+export process_data_for_file
+export process_data_for_url
 export GridInputs
-export process_file_or_url
-export main
 
-end # end module
+# writer
+
+export write_grid_to_csv
+
+end

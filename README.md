@@ -19,7 +19,9 @@ To run it all:
 
 `julia jj.jl`
 
+To run tests:
 
+`julia --project=@. tests/runtests.jl`
 
 
 ```
@@ -32,13 +34,12 @@ test
 
 Hit backspace or Ctrl C to return to Julia REPL. 
 
-Load our MandMath module and call the main() function. 
+Load our MandMath module.
 
 Note: This does not update any changes to the code. 
 
 ```
 using MandMath
-MandMath.main()
 ```
 
 CTRL D to exit back to PowerShell. 
@@ -54,7 +55,7 @@ download, install, and build with `instantiate`.
 
 ```
 ] activate .
-] add Combinatorics
+] add URLs
 ] instantiate
 ] test
 ```
@@ -64,9 +65,6 @@ Or: in Julia:
 ```
 import Pkg
 Pkg.add("JSON")
-Pkg.add("HTTP")
-Pkg.add("Glob")
-Pkg.add("Logging")
 Pkg.precompile()
 using MandMath
 ```
@@ -104,8 +102,6 @@ instantiate
 julia> using Pkg
 
 julia> Pkg.compilecache(Pkg.PackageSpec(path="MandMath"), force=true)
-
-
 
 ## MandArt
 
